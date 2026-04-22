@@ -6,12 +6,20 @@ import { sendSupabaseError } from "../utils.js";
 
 const router = Router();
 
+const optionalTrimmedString = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().trim().optional(),
+);
+
 const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8),
   name: z.string().trim().min(2),
-  phone: z.string().trim().min(6).optional(),
-  address: z.string().trim().optional(),
+  phone: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().trim().min(6).optional(),
+  ),
+  address: optionalTrimmedString,
 });
 
 const loginSchema = z.object({
@@ -27,11 +35,12 @@ router.post("/register", async (request, response) => {
   }
 
   const { email, password, name, phone, address } = payload.data;
-  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+  const { data, error } = await supabaseAuth.auth.signUp({
     email,
     password,
-    email_confirm: true,
-    user_metadata: { name, phone, address },
+    options: {
+      data: { name, phone, address },
+    },
   });
 
   if (error || !data.user) {
@@ -47,23 +56,9 @@ router.post("/register", async (request, response) => {
     role: "user",
   });
 
-  const { data: loginData, error: loginError } = await supabaseAuth.auth.signInWithPassword({ email, password });
-
-  if (loginError || !loginData.session) {
-    return sendSupabaseError(response, loginError, "Login after register failed");
-  }
-
   return response.status(201).json({
     user: data.user,
-    profile: {
-      id: data.user.id,
-      email,
-      name,
-      phone,
-      address,
-      role: "user",
-    },
-    session: loginData.session,
+    session: null,
   });
 });
 
