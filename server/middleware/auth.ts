@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { supabaseAdmin, supabaseForUser } from "../supabase";
+import { supabaseAdmin, supabaseForUser } from "../supabase.js";
 
 export type AuthedRequest = Request & {
   accessToken?: string;

@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { config } from "./config";
-import { requireApiKey } from "./middleware/apiKey";
-import adminRoutes from "./routes/admin";
-import authRoutes from "./routes/auth";
-import bookingRoutes from "./routes/bookings";
-import publicRoutes from "./routes/public";
+import { config } from "./config.js";
+import { requireApiKey } from "./middleware/apiKey.js";
+import adminRoutes from "./routes/admin.js";
+import authRoutes from "./routes/auth.js";
+import bookingRoutes from "./routes/bookings.js";
+import publicRoutes from "./routes/public.js";
 
 export const app = express();
 

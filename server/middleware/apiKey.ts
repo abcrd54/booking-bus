@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
-import { config } from "../config";
+import { config } from "../config.js";
 
 function safeEqual(left: string, right: string) {
   const leftBuffer = Buffer.from(left);

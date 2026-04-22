@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { requireUser, type AuthedRequest } from "../middleware/auth";
-import { supabaseAdmin } from "../supabase";
-import { sendSupabaseError } from "../utils";
+import { requireUser, type AuthedRequest } from "../middleware/auth.js";
+import { supabaseAdmin } from "../supabase.js";
+import { sendSupabaseError } from "../utils.js";
 
 const router = Router();
 
