@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
+    "allowImportingTsExtensions": true,
     "noEmit": true
   },
   "include": ["server/**/*.ts", "api/**/*.ts"]
