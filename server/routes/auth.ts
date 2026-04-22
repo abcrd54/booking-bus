@@ -7,15 +7,15 @@ import { sendSupabaseError } from "../utils.js";
 const router = Router();
 
 const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8),
-  name: z.string().min(2),
-  phone: z.string().min(6).optional(),
-  address: z.string().optional(),
+  name: z.string().trim().min(2),
+  phone: z.string().trim().min(6).optional(),
+  address: z.string().trim().optional(),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().toLowerCase().email(),
   password: z.string().min(1),
 });
 
@@ -27,12 +27,11 @@ router.post("/register", async (request, response) => {
   }
 
   const { email, password, name, phone, address } = payload.data;
-  const { data, error } = await supabaseAuth.auth.signUp({
+  const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
-    options: {
-      data: { name, phone, address },
-    },
+    email_confirm: true,
+    user_metadata: { name, phone, address },
   });
 
   if (error || !data.user) {
@@ -48,9 +47,23 @@ router.post("/register", async (request, response) => {
     role: "user",
   });
 
+  const { data: loginData, error: loginError } = await supabaseAuth.auth.signInWithPassword({ email, password });
+
+  if (loginError || !loginData.session) {
+    return sendSupabaseError(response, loginError, "Login after register failed");
+  }
+
   return response.status(201).json({
     user: data.user,
-    session: data.session,
+    profile: {
+      id: data.user.id,
+      email,
+      name,
+      phone,
+      address,
+      role: "user",
+    },
+    session: loginData.session,
   });
 });
 
