@@ -15,3 +15,5 @@ Thumbs.db
 
 *.log
 vite-dev*.log
+
+.vercel

@@ -18,10 +18,13 @@ function required(name: string) {
 
 export const config = {
   port: Number(process.env.API_PORT ?? 8787),
-  webOrigins: (process.env.WEB_ORIGIN ?? "http://localhost:5173")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean),
+  webOrigins: [
+    ...(process.env.WEB_ORIGIN ?? "http://localhost:5173")
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+  ],
   apiKeys: (process.env.APP_API_KEYS ?? "")
     .split(",")
     .map((key) => key.trim())
