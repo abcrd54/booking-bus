@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MAJU JAYA | Premium Bus Travel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "outline": "#737784",
+                    "secondary": "#516072",
+                    "on-surface-variant": "#434653",
+                    "surface": "#f9f9ff",
+                    "secondary-fixed-dim": "#b9c8de",
+                    "secondary-container": "#d2e1f7",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#2559bd",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#cda729",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "on-background": "#111c2d",
+                    "surface-bright": "#f9f9ff",
+                    "on-secondary-container": "#556477",
+                    "on-primary-fixed": "#001946",
+                    "inverse-on-surface": "#ecf1ff",
+                    "outline-variant": "#c3c6d5",
+                    "primary-fixed": "#dae2ff",
+                    "tertiary-fixed": "#ffe089",
+                    "surface-container": "#e7eeff",
+                    "on-tertiary-fixed": "#241a00",
+                    "background": "#f9f9ff",
+                    "on-surface": "#111c2d",
+                    "surface-dim": "#cfdaf2",
+                    "on-secondary-fixed": "#0d1c2d",
+                    "surface-container-highest": "#d8e3fb",
+                    "on-tertiary-container": "#4f3e00",
+                    "primary": "#00327d",
+                    "surface-container-high": "#dee8ff",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#39485a",
+                    "primary-container": "#0047ab",
+                    "tertiary": "#745b00",
+                    "on-primary-fixed-variant": "#00419e",
+                    "on-tertiary-fixed-variant": "#574500",
+                    "surface-variant": "#d8e3fb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#a5bdff",
+                    "inverse-surface": "#263143",
+                    "surface-container-low": "#f0f3ff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#b1c5ff",
+                    "secondary-fixed": "#d4e4fa",
+                    "tertiary-fixed-dim": "#eac243",
+                    "inverse-primary": "#b1c5ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 30px 60px -12px rgba(17, 28, 45, 0.04);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface">
+
+    <!-- TopAppBar -->
+    <nav class="bg-surface docked full-width top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+        <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined text-slate-500 text-2xl cursor-pointer">menu</span>
+            <span class="text-blue-800 font-extrabold tracking-tighter font-plus-jakarta font-bold text-lg uppercase tracking-widest">MAJU JAYA</span>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-8">
+            <a href="#" class="text-blue-700 font-semibold transition-colors font-label text-[10px] uppercase tracking-wider">Explore</a>
+            <a href="#" class="text-slate-500 hover:bg-blue-50 transition-colors font-label text-[10px] uppercase tracking-wider">Bookings</a>
+            <a href="#" class="text-slate-500 hover:bg-blue-50 transition-colors font-label text-[10px] uppercase tracking-wider">Inbox</a>
+            <a href="#" class="text-slate-500 hover:bg-blue-50 transition-colors font-label text-[10px] uppercase tracking-wider">Account</a>
+        </div>
+
+        <div class="flex items-center">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100" 
+                 alt="User profile photo" 
+                 class="w-10 h-10 rounded-full object-cover border-2 border-surface-container"
+                 data-alt="close-up portrait of a professional man with a kind smile, clean studio lighting, high-end corporate style">
+        </div>
+    </nav>
+
+    <main class="pb-24">
+        <!-- Hero Section -->
+        <section class="relative min-h-[751px] flex items-center pt-12">
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=2000" 
+                     class="w-full h-full object-cover" 
+                     alt="Luxury Bus" 
+                     data-alt="sleek modern luxury coach bus driving on a scenic highway through rolling hills at sunrise, cinematic lighting, professional photography">
+                <div class="absolute inset-0 bg-gradient-to-r from-on-background/80 to-transparent"></div>
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="max-w-3xl">
+                    <h1 class="font-headline text-5xl md:text-7xl font-extrabold text-on-primary leading-tight mb-6 tracking-tight">
+                        Experience the <span class="text-tertiary-fixed">Sovereign</span> Journey
+                    </h1>
+                    <p class="text-primary-fixed text-lg md:text-xl max-w-xl mb-12 opacity-90 leading-relaxed">
+                        Elevate your travel expectations with our executive fleet. Where comfort meets the horizon in every mile.
+                    </p>
+
+                    <!-- Search Form Card -->
+                    <div class="glass-panel rounded-xl p-2 editorial-shadow max-w-4xl">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                            <div class="bg-surface-container-lowest rounded-xl p-4 transition-all hover:bg-surface-container-high group border-b-2 border-transparent focus-within:border-tertiary-fixed">
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Origin</label>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-xl">location_on</span>
+                                    <input type="text" placeholder="Departure City" class="bg-transparent border-none p-0 w-full focus:ring-0 font-semibold text-on-surface placeholder:text-outline-variant">
+                                </div>
+                            </div>
+                            <div class="bg-surface-container-lowest rounded-xl p-4 transition-all hover:bg-surface-container-high group border-b-2 border-transparent focus-within:border-tertiary-fixed">
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Destination</label>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-xl">near_me</span>
+                                    <input type="text" placeholder="Arrival City" class="bg-transparent border-none p-0 w-full focus:ring-0 font-semibold text-on-surface placeholder:text-outline-variant">
+                                </div>
+                            </div>
+                            <div class="bg-surface-container-lowest rounded-xl p-4 transition-all hover:bg-surface-container-high group border-b-2 border-transparent focus-within:border-tertiary-fixed">
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Date</label>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-xl">calendar_today</span>
+                                    <input type="text" placeholder="Set Date" class="bg-transparent border-none p-0 w-full focus:ring-0 font-semibold text-on-surface placeholder:text-outline-variant">
+                                </div>
+                            </div>
+                            <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary font-headline font-bold rounded-xl h-full flex items-center justify-center gap-2 py-4 md:py-0 transition-transform active:scale-95">
+                                <span>Search Trips</span>
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promo Section -->
+        <section class="py-20 bg-surface-container-low overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="flex justify-between items-end mb-12">
+                    <div>
+                        <span class="text-tertiary font-bold tracking-[0.2em] uppercase text-xs mb-3 block">Exclusive Offers</span>
+                        <h2 class="font-headline text-4xl font-extrabold text-on-background tracking-tight">Holiday Privileges</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Promo Card 1 -->
+                    <div class="relative h-64 rounded-xl overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=1200" 
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                             alt="Travel Promo"
+                             data-alt="dramatic landscape of a road winding through mountain peaks at twilight, deep blues and orange hues, adventure aesthetic">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-8 text-on-primary">
+                            <span class="bg-tertiary text-on-tertiary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block">Limited Time</span>
+                            <h3 class="text-2xl font-headline font-bold mb-2">Summer Solstice Discount</h3>
+                            <p class="text-primary-fixed opacity-80 mb-4">Save up to 35% on all inter-island routes this season.</p>
+                            <span class="flex items-center gap-2 font-bold group-hover:gap-4 transition-all">Claim Code: SUMMER35 <span class="material-symbols-outlined">trending_flat</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Promo Card 2 -->
+                    <div class="relative h-64 rounded-xl overflow-hidden group">
+                        <img src="https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?auto=format&fit=crop&q=80&w=1200" 
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                             alt="Luxury Experience"
+                             data-alt="modern luxury hotel balcony overlooking a pristine tropical coastline, golden hour lighting, minimalist architecture">
+                        <div class="absolute inset-0 bg-gradient-to-t from-on-background/90 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-8 text-on-primary">
+                            <span class="bg-primary-container text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block">Member Only</span>
+                            <h3 class="text-2xl font-headline font-bold mb-2">First Class Loyalty</h3>
+                            <p class="text-outline-variant opacity-80 mb-4">Earn double points on all executive class bookings.</p>
+                            <span class="flex items-center gap-2 font-bold group-hover:gap-4 transition-all">Join Voyager Club <span class="material-symbols-outlined">trending_flat</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Routes: Bento Grid -->
+        <section class="py-24 bg-surface">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <span class="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-3 block">Curated Destinations</span>
+                    <h2 class="font-headline text-5xl font-extrabold text-on-background tracking-tight">Populer Routes</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-full md:h-[600px]">
+                    <!-- Large Feature -->
+                    <div class="md:col-span-8 bg-surface-container-lowest rounded-xl overflow-hidden relative group editorial-shadow">
+                        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=1200" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                             alt="Jakarta"
+                             data-alt="cityscape of Jakarta skyline at sunset, glowing skyscrapers and purple sky, high-angle architectural photography">
+                        <div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-transparent"></div>
+                        <div class="absolute top-6 left-6 flex flex-col gap-2">
+                             <div class="glass-panel text-on-surface px-4 py-2 rounded-full font-bold text-sm backdrop-blur-md">
+                                From <span class="text-primary">IDR 250k</span>
+                             </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-10">
+                            <h3 class="font-headline text-4xl font-extrabold text-on-primary mb-2">Jakarta — Yogyakarta</h3>
+                            <div class="flex items-center gap-6 text-on-primary/80">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 8h 30m</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">airline_seat_recline_extra</span> Executive Sleeper</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Grid Column -->
+                    <div class="md:col-span-4 flex flex-col gap-6">
+                        <!-- Route 2 -->
+                        <div class="h-1/2 bg-surface-container-lowest rounded-xl overflow-hidden relative group editorial-shadow">
+                            <img src="https://images.unsplash.com/photo-1555620263-73c026840d83?auto=format&fit=crop&q=80&w=800" 
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                 alt="Bandung"
+                                 data-alt="charming mountain city view of Bandung, misty hills and lush greenery, soft morning light">
+                            <div class="absolute inset-0 bg-on-background/40"></div>
+                            <div class="absolute inset-0 flex flex-col justify-end p-8 text-on-primary">
+                                <h3 class="font-headline text-xl font-bold mb-1">Jakarta — Bandung</h3>
+                                <p class="text-sm opacity-80 mb-3">Daily departures every 30 min</p>
+                                <span class="text-tertiary-fixed font-bold">Start from IDR 120k</span>
+                            </div>
+                        </div>
+                        <!-- Route 3 -->
+                        <div class="h-1/2 bg-surface-container-lowest rounded-xl overflow-hidden relative group editorial-shadow">
+                            <img src="https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=800" 
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                 alt="Surabaya"
+                                 data-alt="modern urban landscape of Surabaya, architectural landmark with clear blue sky, crisp lighting">
+                            <div class="absolute inset-0 bg-on-background/40"></div>
+                            <div class="absolute inset-0 flex flex-col justify-end p-8 text-on-primary">
+                                <h3 class="font-headline text-xl font-bold mb-1">Semarang — Surabaya</h3>
+                                <p class="text-sm opacity-80 mb-3">Luxury Royal Class Service</p>
+                                <span class="text-tertiary-fixed font-bold">Start from IDR 310k</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Features -->
+        <section class="py-24 bg-surface-container-low">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="space-y-4">
+                        <div class="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center text-on-primary mb-6">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                        </div>
+                        <h4 class="font-headline text-xl font-bold">Safe & Secured</h4>
+                        <p class="text-secondary leading-relaxed">Advanced GPS tracking and rigorous safety protocols for every fleet, ensuring your peace of mind.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center text-primary mb-6">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">chair</span>
+                        </div>
+                        <h4 class="font-headline text-xl font-bold">Infinite Comfort</h4>
+                        <p class="text-secondary leading-relaxed">Ergonomic sleeper seats with ample legroom, personal entertainment systems, and refreshments.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-16 h-16 bg-tertiary-container rounded-full flex items-center justify-center text-on-tertiary mb-6">
+                            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">timer</span>
+                        </div>
+                        <h4 class="font-headline text-xl font-bold">Punctual Departure</h4>
+                        <p class="text-secondary leading-relaxed">We respect your time. Our schedules are managed with meticulous precision for seamless travel.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-t-3xl z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+        <a href="#" class="flex flex-col items-center justify-center text-blue-800 dark:text-blue-300 relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-gold-500 after:rounded-full font-manrope text-[10px] font-semibold uppercase tracking-wider">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+            <span>Explore</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-manrope text-[10px] font-semibold uppercase tracking-wider hover:text-blue-600 transition-all active:scale-90 transition-transform duration-200">
+            <span class="material-symbols-outlined">confirmation_number</span>
+            <span>Bookings</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-manrope text-[10px] font-semibold uppercase tracking-wider hover:text-blue-600 transition-all active:scale-90 transition-transform duration-200">
+            <span class="material-symbols-outlined">mail</span>
+            <span>Inbox</span>
+        </a>
+        <a href="#" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-manrope text-[10px] font-semibold uppercase tracking-wider hover:text-blue-600 transition-all active:scale-90 transition-transform duration-200">
+            <span class="material-symbols-outlined">person</span>
+            <span>Account</span>
+        </a>
+    </nav>
+
+</body>
+</html></style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body></body></html>
