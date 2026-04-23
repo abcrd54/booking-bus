@@ -26,6 +26,127 @@ const midtransWebhookSchema = z.object({
   merchant_id: z.string().optional(),
 });
 
+type BookingStatus = "pending_payment" | "paid" | "cancelled" | "expired";
+type PaymentStatus = "pending" | "settlement" | "expire" | "cancel" | "deny";
+
+function mapMidtransToBookingState(transactionStatus: string, fraudStatus?: string) {
+  let bookingStatus: BookingStatus = "pending_payment";
+  let paymentStatus: PaymentStatus = "pending";
+  let shouldBookSeats = false;
+  let shouldReleaseSeats = false;
+
+  if (transactionStatus === "capture") {
+    if (fraudStatus === "challenge") {
+      bookingStatus = "pending_payment";
+      paymentStatus = "pending";
+    } else {
+      bookingStatus = "paid";
+      paymentStatus = "settlement";
+      shouldBookSeats = true;
+    }
+  } else if (transactionStatus === "settlement") {
+    bookingStatus = "paid";
+    paymentStatus = "settlement";
+    shouldBookSeats = true;
+  } else if (transactionStatus === "pending") {
+    bookingStatus = "pending_payment";
+    paymentStatus = "pending";
+  } else if (transactionStatus === "expire") {
+    bookingStatus = "expired";
+    paymentStatus = "expire";
+    shouldReleaseSeats = true;
+  } else if (transactionStatus === "cancel") {
+    bookingStatus = "cancelled";
+    paymentStatus = "cancel";
+    shouldReleaseSeats = true;
+  } else if (transactionStatus === "deny") {
+    bookingStatus = "cancelled";
+    paymentStatus = "deny";
+    shouldReleaseSeats = true;
+  }
+
+  return { bookingStatus, paymentStatus, shouldBookSeats, shouldReleaseSeats };
+}
+
+async function applyBookingPaymentStatus(params: {
+  bookingId: string;
+  totalAmount: number;
+  orderId: string;
+  transactionStatus: string;
+  fraudStatus?: string;
+  paymentType?: string;
+  transactionId?: string;
+  rawResponse: unknown;
+}) {
+  const state = mapMidtransToBookingState(params.transactionStatus, params.fraudStatus);
+
+  const { data: updatedBooking, error: updateBookingError } = await supabaseAdmin
+    .from("bookings")
+    .update({
+      booking_status: state.bookingStatus,
+      payment_status: state.paymentStatus,
+    })
+    .eq("id", params.bookingId)
+    .select("id,booking_code,booking_status,payment_status,total_amount,midtrans_order_id")
+    .single();
+
+  if (updateBookingError || !updatedBooking) {
+    throw updateBookingError ?? new Error("Booking payment update failed");
+  }
+
+  if (state.shouldBookSeats) {
+    await supabaseAdmin
+      .from("trip_seats")
+      .update({
+        status: "booked",
+        locked_until: null,
+      })
+      .eq("booking_id", params.bookingId);
+  } else if (state.shouldReleaseSeats) {
+    await supabaseAdmin
+      .from("trip_seats")
+      .update({
+        status: "available",
+        locked_until: null,
+        booking_id: null,
+      })
+      .eq("booking_id", params.bookingId);
+  }
+
+  const paymentUpdate = {
+    transaction_id: params.transactionId ?? null,
+    transaction_status: params.transactionStatus,
+    fraud_status: params.fraudStatus ?? null,
+    payment_type: params.paymentType ?? null,
+    raw_response: params.rawResponse,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: existingPayments, error: existingPaymentError } = await supabaseAdmin
+    .from("payments")
+    .select("id")
+    .eq("booking_id", params.bookingId)
+    .eq("order_id", params.orderId);
+
+  if (!existingPaymentError && existingPayments && existingPayments.length > 0) {
+    await supabaseAdmin
+      .from("payments")
+      .update(paymentUpdate)
+      .eq("booking_id", params.bookingId)
+      .eq("order_id", params.orderId);
+  } else {
+    await supabaseAdmin.from("payments").insert({
+      booking_id: params.bookingId,
+      provider: "midtrans",
+      order_id: params.orderId,
+      gross_amount: Number(params.totalAmount),
+      ...paymentUpdate,
+    });
+  }
+
+  return updatedBooking;
+}
+
 function calculateDiscount(voucher: { discount_type: string; discount_value: number; max_discount: number | null }, subtotal: number) {
   const rawDiscount = voucher.discount_type === "percent"
     ? Math.floor((subtotal * Number(voucher.discount_value)) / 100)
@@ -181,8 +302,100 @@ router.get("/my-bookings", requireUser, async (request: AuthedRequest, response)
   return response.json({ bookings: data });
 });
 
+router.post("/payments/sync", requireUser, async (request: AuthedRequest, response) => {
+  if (!config.midtrans.serverKey) {
+    return response.status(503).json({
+      error: "Midtrans not configured",
+      message: "MIDTRANS_SERVER_KEY belum terpasang di environment API.",
+    });
+  }
+
+  const { data: pendingBookings, error: pendingError } = await supabaseAdmin
+    .from("bookings")
+    .select("id,total_amount,midtrans_order_id,payment_status")
+    .eq("user_id", request.user!.id)
+    .eq("payment_status", "pending")
+    .not("midtrans_order_id", "is", null);
+
+  if (pendingError) {
+    return sendSupabaseError(response, pendingError, "Pending booking lookup failed");
+  }
+
+  if (!pendingBookings || pendingBookings.length === 0) {
+    return response.json({ ok: true, synced: 0, message: "No pending payments" });
+  }
+
+  const midtransApiBase = config.midtrans.isProduction
+    ? "https://api.midtrans.com/v2"
+    : "https://api.sandbox.midtrans.com/v2";
+  const authHeader = `Basic ${Buffer.from(`${config.midtrans.serverKey}:`).toString("base64")}`;
+
+  let synced = 0;
+  const failures: Array<{ booking_id: string; message: string }> = [];
+
+  for (const booking of pendingBookings) {
+    const orderId = booking.midtrans_order_id?.trim();
+    if (!orderId) continue;
+
+    try {
+      const statusResponse = await fetch(`${midtransApiBase}/${encodeURIComponent(orderId)}/status`, {
+        method: "GET",
+        headers: {
+          Authorization: authHeader,
+          Accept: "application/json",
+        },
+      });
+      const statusJson = (await statusResponse.json()) as {
+        transaction_status?: string;
+        fraud_status?: string;
+        payment_type?: string;
+        transaction_id?: string;
+      };
+
+      if (!statusResponse.ok || !statusJson.transaction_status) {
+        failures.push({
+          booking_id: booking.id,
+          message: "Midtrans status request failed",
+        });
+        continue;
+      }
+
+      await applyBookingPaymentStatus({
+        bookingId: booking.id,
+        totalAmount: Number(booking.total_amount),
+        orderId,
+        transactionStatus: statusJson.transaction_status,
+        fraudStatus: statusJson.fraud_status,
+        paymentType: statusJson.payment_type,
+        transactionId: statusJson.transaction_id,
+        rawResponse: statusJson,
+      });
+
+      synced += 1;
+    } catch (error) {
+      failures.push({
+        booking_id: booking.id,
+        message: error instanceof Error ? error.message : "Unknown sync error",
+      });
+    }
+  }
+
+  return response.json({
+    ok: true,
+    synced,
+    pending: pendingBookings.length,
+    failed: failures.length,
+    failures,
+  });
+});
+
 router.post("/payments/create", requireUser, async (request: AuthedRequest, response) => {
-  const payload = z.object({ booking_id: z.string().uuid() }).safeParse(request.body);
+  const payload = z
+    .object({
+      booking_id: z.string().uuid(),
+      return_to_app: z.boolean().optional(),
+    })
+    .safeParse(request.body);
 
   if (!payload.success) {
     return response.status(422).json({ error: "Invalid payment payload", details: payload.error.flatten() });
@@ -233,7 +446,9 @@ router.post("/payments/create", requireUser, async (request: AuthedRequest, resp
       phone: profile?.phone || undefined,
     },
     callbacks: {
-      finish: config.midtrans.finishRedirectUrl,
+      finish: payload.data.return_to_app
+        ? config.midtrans.finishRedirectUrlApp
+        : config.midtrans.finishRedirectUrl,
     },
   };
 
@@ -345,102 +560,22 @@ router.post("/payments/midtrans/webhook", async (request, response) => {
     return response.status(404).json({ error: "Booking not found for this order_id" });
   }
 
-  let bookingStatus: "pending_payment" | "paid" | "cancelled" | "expired" = "pending_payment";
-  let paymentStatus: "pending" | "settlement" | "expire" | "cancel" | "deny" = "pending";
-  let shouldBookSeats = false;
-  let shouldReleaseSeats = false;
-
-  if (data.transaction_status === "capture") {
-    if (data.fraud_status === "challenge") {
-      bookingStatus = "pending_payment";
-      paymentStatus = "pending";
-    } else {
-      bookingStatus = "paid";
-      paymentStatus = "settlement";
-      shouldBookSeats = true;
-    }
-  } else if (data.transaction_status === "settlement") {
-    bookingStatus = "paid";
-    paymentStatus = "settlement";
-    shouldBookSeats = true;
-  } else if (data.transaction_status === "pending") {
-    bookingStatus = "pending_payment";
-    paymentStatus = "pending";
-  } else if (data.transaction_status === "expire") {
-    bookingStatus = "expired";
-    paymentStatus = "expire";
-    shouldReleaseSeats = true;
-  } else if (data.transaction_status === "cancel") {
-    bookingStatus = "cancelled";
-    paymentStatus = "cancel";
-    shouldReleaseSeats = true;
-  } else if (data.transaction_status === "deny") {
-    bookingStatus = "cancelled";
-    paymentStatus = "deny";
-    shouldReleaseSeats = true;
-  }
-
-  const { data: updatedBooking, error: updateBookingError } = await supabaseAdmin
-    .from("bookings")
-    .update({
-      booking_status: bookingStatus,
-      payment_status: paymentStatus,
-    })
-    .eq("id", booking.id)
-    .select("id,booking_code,booking_status,payment_status,total_amount,midtrans_order_id")
-    .single();
-
-  if (updateBookingError || !updatedBooking) {
-    return sendSupabaseError(response, updateBookingError, "Webhook booking update failed");
-  }
-
-  if (shouldBookSeats) {
-    await supabaseAdmin
-      .from("trip_seats")
-      .update({
-        status: "booked",
-        locked_until: null,
-      })
-      .eq("booking_id", booking.id);
-  } else if (shouldReleaseSeats) {
-    await supabaseAdmin
-      .from("trip_seats")
-      .update({
-        status: "available",
-        locked_until: null,
-        booking_id: null,
-      })
-      .eq("booking_id", booking.id);
-  }
-
-  const paymentUpdate = {
-    transaction_id: data.transaction_id ?? null,
-    transaction_status: data.transaction_status,
-    fraud_status: data.fraud_status ?? null,
-    payment_type: data.payment_type ?? null,
-    raw_response: request.body,
-    updated_at: new Date().toISOString(),
-  };
-
-  const { data: existingPayments, error: existingPaymentError } = await supabaseAdmin
-    .from("payments")
-    .select("id")
-    .eq("booking_id", booking.id)
-    .eq("order_id", data.order_id);
-
-  if (!existingPaymentError && existingPayments && existingPayments.length > 0) {
-    await supabaseAdmin
-      .from("payments")
-      .update(paymentUpdate)
-      .eq("booking_id", booking.id)
-      .eq("order_id", data.order_id);
-  } else {
-    await supabaseAdmin.from("payments").insert({
-      booking_id: booking.id,
-      provider: "midtrans",
-      order_id: data.order_id,
-      gross_amount: Number(updatedBooking.total_amount),
-      ...paymentUpdate,
+  let updatedBooking;
+  try {
+    updatedBooking = await applyBookingPaymentStatus({
+      bookingId: booking.id,
+      totalAmount: Number(booking.total_amount),
+      orderId: data.order_id,
+      transactionStatus: data.transaction_status,
+      fraudStatus: data.fraud_status,
+      paymentType: data.payment_type,
+      transactionId: data.transaction_id,
+      rawResponse: request.body,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      error: "Webhook booking update failed",
+      message: error instanceof Error ? error.message : "Unknown error",
     });
   }
 

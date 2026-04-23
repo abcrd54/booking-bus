@@ -42,5 +42,7 @@ export const config = {
     clientKey: process.env.MIDTRANS_CLIENT_KEY?.trim() || "",
     isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
     finishRedirectUrl: process.env.MIDTRANS_FINISH_REDIRECT_URL?.trim() || "https://booking-bus-gold.vercel.app",
+    finishRedirectUrlApp:
+      process.env.MIDTRANS_FINISH_REDIRECT_URL_APP?.trim() || "majujaya://payment-finish",
   },
 };
