@@ -33,5 +33,6 @@ export const config = {
     url: required("SUPABASE_URL"),
     anonKey: required("SUPABASE_ANON_KEY"),
     serviceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
+    emailRedirectTo: process.env.SUPABASE_EMAIL_REDIRECT_TO?.trim() || undefined,
   },
 };

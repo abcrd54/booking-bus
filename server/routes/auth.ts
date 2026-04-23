@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { requireUser, type AuthedRequest } from "../middleware/auth.js";
+import { config } from "../config.js";
 import { supabaseAdmin, supabaseAuth } from "../supabase.js";
 import { sendSupabaseError } from "../utils.js";
 
@@ -27,6 +28,18 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+const resendVerificationSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+});
+
+function isConfirmationEmailDeliveryError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const message = "message" in error && typeof (error as { message?: unknown }).message === "string"
+    ? (error as { message: string }).message
+    : "";
+  return message.toLowerCase().includes("error sending confirmation email");
+}
+
 router.post("/register", async (request, response) => {
   const payload = registerSchema.safeParse(request.body);
 
@@ -40,10 +53,19 @@ router.post("/register", async (request, response) => {
     password,
     options: {
       data: { name, phone, address },
+      ...(config.supabase.emailRedirectTo ? { emailRedirectTo: config.supabase.emailRedirectTo } : {}),
     },
   });
 
   if (error || !data.user) {
+    if (isConfirmationEmailDeliveryError(error)) {
+      return response.status(503).json({
+        error: "Register failed",
+        code: "SMTP_DELIVERY_FAILED",
+        message:
+          "Akun belum bisa dibuat karena Supabase gagal mengirim email verifikasi. Cek konfigurasi SMTP Resend di Supabase Auth.",
+      });
+    }
     return sendSupabaseError(response, error, "Register failed");
   }
 
@@ -59,6 +81,50 @@ router.post("/register", async (request, response) => {
   return response.status(201).json({
     user: data.user,
     session: null,
+    verification: {
+      email,
+      sent: true,
+      redirect_to: config.supabase.emailRedirectTo ?? null,
+    },
+  });
+});
+
+router.post("/resend-verification", async (request, response) => {
+  const payload = resendVerificationSchema.safeParse(request.body);
+
+  if (!payload.success) {
+    return response.status(422).json({ error: "Invalid resend payload", details: payload.error.flatten() });
+  }
+
+  const { email } = payload.data;
+
+  const { error } = await supabaseAuth.auth.resend({
+    type: "signup",
+    email,
+    options: {
+      ...(config.supabase.emailRedirectTo ? { emailRedirectTo: config.supabase.emailRedirectTo } : {}),
+    },
+  });
+
+  if (error) {
+    if (isConfirmationEmailDeliveryError(error)) {
+      return response.status(503).json({
+        error: "Resend verification failed",
+        code: "SMTP_DELIVERY_FAILED",
+        message:
+          "Supabase gagal mengirim ulang email verifikasi. Cek konfigurasi SMTP Resend di Supabase Auth.",
+      });
+    }
+    return sendSupabaseError(response, error, "Resend verification failed");
+  }
+
+  return response.json({
+    ok: true,
+    verification: {
+      email,
+      sent: true,
+      redirect_to: config.supabase.emailRedirectTo ?? null,
+    },
   });
 });
 

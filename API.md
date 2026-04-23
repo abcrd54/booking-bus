@@ -50,6 +50,7 @@ GET /trips/:id/seats
 
 ```http
 POST /auth/register
+POST /auth/resend-verification
 POST /auth/login
 GET /auth/me
 POST /auth/logout
@@ -64,6 +65,14 @@ Register body:
   "name": "Nama User",
   "phone": "08123456789",
   "address": "Jakarta"
+}
+```
+
+Resend verification body:
+
+```json
+{
+  "email": "user@example.com"
 }
 ```
 
