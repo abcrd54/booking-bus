@@ -27,7 +27,8 @@ Authorization: Bearer <supabase_access_token>
 3. Isi `APP_API_KEYS` dengan key untuk aplikasi/mobile. Pisahkan beberapa key dengan koma jika perlu.
 4. Jalankan SQL di `supabase/schema.sql` lewat Supabase SQL Editor.
 5. Jalankan SQL dummy data di `supabase/seed.sql` jika butuh data awal untuk testing.
-6. Untuk development, jalankan API dan web secara manual sesuai kebutuhan:
+6. Untuk refresh jadwal 5 hari ke depan (rute + armada + trip), jalankan `supabase/seed_next_5_days.sql`.
+7. Untuk development, jalankan API dan web secara manual sesuai kebutuhan:
 
 ```bash
 npm run api
@@ -92,6 +93,7 @@ POST /bookings
 GET /bookings/:id
 GET /my-bookings
 POST /payments/create
+POST /payments/midtrans/webhook
 ```
 
 Create booking body:

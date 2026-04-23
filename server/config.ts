@@ -37,4 +37,10 @@ export const config = {
     serviceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
     emailRedirectTo: process.env.SUPABASE_EMAIL_REDIRECT_TO?.trim() || defaultEmailRedirectTo,
   },
+  midtrans: {
+    serverKey: process.env.MIDTRANS_SERVER_KEY?.trim() || "",
+    clientKey: process.env.MIDTRANS_CLIENT_KEY?.trim() || "",
+    isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
+    finishRedirectUrl: process.env.MIDTRANS_FINISH_REDIRECT_URL?.trim() || "https://booking-bus-gold.vercel.app",
+  },
 };

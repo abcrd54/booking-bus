@@ -10,6 +10,11 @@ function safeEqual(left: string, right: string) {
 }
 
 export function requireApiKey(request: Request, response: Response, next: NextFunction) {
+  // Midtrans webhook hits this endpoint server-to-server without x-api-key.
+  if (request.method === "POST" && request.path === "/payments/midtrans/webhook") {
+    return next();
+  }
+
   const origin = request.header("origin");
   const referer = request.header("referer");
   const isTrustedWebsite =
