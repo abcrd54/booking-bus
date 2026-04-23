@@ -16,6 +16,8 @@ function required(name: string) {
   return value;
 }
 
+const defaultEmailRedirectTo = "https://booking-bus-gold.vercel.app/auth/verified";
+
 export const config = {
   port: Number(process.env.API_PORT ?? 8787),
   webOrigins: [
@@ -33,6 +35,6 @@ export const config = {
     url: required("SUPABASE_URL"),
     anonKey: required("SUPABASE_ANON_KEY"),
     serviceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
-    emailRedirectTo: process.env.SUPABASE_EMAIL_REDIRECT_TO?.trim() || undefined,
+    emailRedirectTo: process.env.SUPABASE_EMAIL_REDIRECT_TO?.trim() || defaultEmailRedirectTo,
   },
 };

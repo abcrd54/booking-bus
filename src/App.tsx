@@ -45,7 +45,7 @@ const AdminDashboard = lazy(() =>
 );
 
 type UserRole = "user" | "admin";
-type ActiveView = "public" | "booking" | "admin" | "login";
+type ActiveView = "public" | "booking" | "admin" | "login" | "verified";
 type AuthMode = "login" | "register";
 
 type Trip = {
@@ -154,6 +154,7 @@ function defaultTravelDate() {
 }
 
 function viewFromPath(pathname: string): ActiveView {
+  if (pathname === "/auth/verified") return "verified";
   if (pathname === "/login") return "login";
   if (pathname === "/admin") return "admin";
   return "public";
@@ -320,6 +321,10 @@ function App() {
         onBack={() => navigate("public")}
       />
     );
+  }
+
+  if (activeView === "verified") {
+    return <VerificationStatusPage onGoHome={() => navigate("public")} onGoLogin={() => navigate("login")} />;
   }
 
   if (activeView === "admin") {
@@ -1942,6 +1947,63 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function VerificationStatusPage({
+  onGoHome,
+  onGoLogin,
+}: {
+  onGoHome: () => void;
+  onGoLogin: () => void;
+}) {
+  const [status, message] = useMemo(() => {
+    const query = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const error = query.get("error") ?? hash.get("error");
+    const errorDescription = query.get("error_description") ?? hash.get("error_description");
+
+    if (error) {
+      return [
+        "error",
+        errorDescription
+          ? decodeURIComponent(errorDescription)
+          : "Verifikasi email gagal. Link mungkin sudah expired atau sudah pernah dipakai.",
+      ] as const;
+    }
+
+    return ["success", "Email berhasil diverifikasi. Sekarang kamu bisa login dan lanjut booking."] as const;
+  }, []);
+
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#f7f9fc] px-4 py-10 text-slate-950">
+      <Card className="w-full max-w-lg border-slate-200">
+        <CardContent className="space-y-6 p-8 text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-slate-100">
+            {status === "success" ? (
+              <CheckCircle2 className="text-emerald-600" size={34} />
+            ) : (
+              <ShieldCheck className="text-amber-600" size={34} />
+            )}
+          </div>
+          <div className="space-y-2">
+            <h1 className="font-display text-3xl font-extrabold tracking-tight">
+              {status === "success" ? "Verifikasi Berhasil" : "Verifikasi Gagal"}
+            </h1>
+            <p className={cn("text-sm leading-6", status === "success" ? "text-slate-600" : "text-amber-700")}>{message}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button onClick={onGoLogin}>
+              <LogIn size={16} />
+              Login
+            </Button>
+            <Button variant="secondary" onClick={onGoHome}>
+              Kembali ke Home
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </main>
   );
 }
 
